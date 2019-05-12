@@ -9,31 +9,37 @@ class TicTacToeNode
   end
 
   def losing_node?(evaluator)
+    game_ending_results = []
+
     if self.board.over?
-      winner = self.board.winner
-      return winner != evaluator if winner
+      return self.board.winner != evaluator && self.board.won?
     end
 
-    if evaluator == next_mover_mark
-      self.children.all? {|node| node.losing_node?(evaluator)}
-    else
-      self.children.any? {|node| node.losing_node?(evaluator)}
+    self.children.each do |child|
+      game_ending_results << child.losing_node?(evaluator)
     end
+
+    if evaluator == self.next_mover_mark
+      game_ending_results.all? {|result| result}
+    else
+      game_ending_results.any? {|result| result}
+    end
+
+
   end
 
   def winning_node?(evaluator)
     game_ending_results = []
 
     if self.board.over?
-      winner = self.board.winner
-      return winner == evaluator if winner
+      return self.board.winner == evaluator
     end
 
     self.children.each do |child|
       game_ending_results << child.winning_node?(evaluator)
     end
 
-    if evaluator == next_mover_mark
+    if evaluator == self.next_mover_mark
       game_ending_results.any? {|result| result == true}
     else
       game_ending_results.all? {|result| result == true}
@@ -59,6 +65,7 @@ class TicTacToeNode
       end
     end
     next_moves
+
   end
 
   attr_accessor :board, :next_mover_mark, :prev_move_pos
